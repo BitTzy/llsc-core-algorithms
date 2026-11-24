@@ -1,0 +1,987 @@
+[
+  {
+    "title": "LENDING LEDGER AND SAVING CIRCLE",
+    "body": [
+      "Project proposal and revised prototype",
+      "Java 21 desktop application for lending records and shared savings"
+    ],
+    "note": "Records only. Money and belongings are exchanged outside the system.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "INTRODUCTION",
+    "body": [
+      "A shared record of money loans, borrowed belongings and group savings.",
+      "Both loan parties confirm the terms, handover and repayment or return.",
+      "The desktop app supports multiple signed-in account tabs on one computer.",
+      "Saving circles keep contributions and spending separate from loan balances."
+    ],
+    "note": "Current implementation: Swing interface, Spring services, JDBC and embedded H2.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "CONCEPT DESCRIPTION",
+    "body": [
+      "Lending ledger: versioned agreements, confirmed handovers, partial repayments and item returns.",
+      "Reminders: due-soon, due-today and overdue notices while the app is running.",
+      "Return reliability: on-time completed borrowing records / completed borrowing records.",
+      "Saving circles: goals, schedules, invitations, contribution review and retained history."
+    ],
+    "note": "",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "THE PROBLEM",
+    "body": [
+      "Loan details get lost across messages and memory.",
+      "A repayment claim needs review before it changes the balance.",
+      "Groups need consent before membership and a clear contribution approval process.",
+      "Late review should not rewrite when an exchange or submission happened."
+    ],
+    "note": "Goal: shared records with explicit confirmation and clear dates.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "SCOPE AND LIMITATIONS",
+    "body": [
+      "Included: accounts, lending and borrowing tabs, receipts for loan activities, notices and calendar export.",
+      "Included: circle goals, schedules, invitations, contribution review and leaving with history retained.",
+      "Excluded: payment processing, bank/e-wallet integration and automatic proof of real-world exchanges.",
+      "Local prototype: account tabs share one database; this is not a remote multi-device service."
+    ],
+    "note": "Loan reliability is not a credit score. No circle contribution score is currently calculated.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "SIGNIFICANCE OF THE STUDY",
+    "body": [
+      "Lenders and borrowers: review agreed dates and confirmed remaining balances.",
+      "Members: accept invitations and submit their own contributions for review.",
+      "Organisers: approve or reject contributions and reconcile the recorded balance.",
+      "Student groups: track borrowed equipment and shared project savings.",
+      "Project team: apply Java desktop design, transactions, validation and relational modelling."
+    ],
+    "note": "",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "DEFINITION OF TERMS",
+    "body": [
+      "Actual date: reported date of the external handover, payment or return.",
+      "Submission time: when the record was created in the system.",
+      "Review time: when another party approved, confirmed or rejected the record.",
+      "Recorded circle balance: approved contributions minus approved expenses and withdrawals.",
+      "Return reliability: loan completion punctuality; no completed history means Not yet rated."
+    ],
+    "note": "",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "SYSTEM FLOWCHART: LOAN AGREEMENT",
+    "body": [],
+    "note": "Figure 1. The original web-style flow is replaced by the implemented loan states.",
+    "nodes": [
+      {
+        "id": "a",
+        "text": "Sign in / select account tab",
+        "x": 100,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "b",
+        "text": "Propose terms\nPENDING_TERMS",
+        "x": 555,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "c",
+        "text": "Both parties confirm\nAWAITING_HANDOVER",
+        "x": 1000,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "d",
+        "text": "Lender records handover\nOther party reviews",
+        "x": 1000,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "e",
+        "text": "Confirmed handover\nACTIVE loan",
+        "x": 555,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "f",
+        "text": "Repayment / return\nSee Figure 2",
+        "x": 100,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      }
+    ],
+    "edges": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "b",
+        "c"
+      ],
+      [
+        "c",
+        "d"
+      ],
+      [
+        "d",
+        "e"
+      ],
+      [
+        "e",
+        "f"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "SYSTEM FLOWCHART: RETURN OR REPAY",
+    "body": [],
+    "note": "Figure 2. Only confirmed activity affects the balance. A dispute leaves it unchanged.",
+    "nodes": [
+      {
+        "id": "a",
+        "text": "ACTIVE loan\nBorrower records activity",
+        "x": 100,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "b",
+        "text": "PENDING_REVIEW\nOptional loan receipt",
+        "x": 555,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "c",
+        "text": "Other party reviews\nConfirm or dispute",
+        "x": 1000,
+        "y": 280,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "d",
+        "text": "CONFIRMED\nUpdate recorded balance",
+        "x": 1000,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "e",
+        "text": "Fully repaid / returned?\nYes: COMPLETED; no: ACTIVE",
+        "x": 555,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "f",
+        "text": "DISPUTED\nReason + corrected submission",
+        "x": 100,
+        "y": 510,
+        "w": 330,
+        "h": 105
+      }
+    ],
+    "edges": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "b",
+        "c"
+      ],
+      [
+        "c",
+        "d"
+      ],
+      [
+        "d",
+        "e"
+      ],
+      [
+        "c",
+        "f"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "ERD: LOANS AND ACCOUNTS",
+    "body": [],
+    "note": "Figure 3. Connectors show parent to child (1 to many unless labelled). Terms use the composite key loan_id + version.",
+    "nodes": [
+      {
+        "id": "u",
+        "text": "app_user\nPK id\nname, email, password_hash",
+        "x": 85,
+        "y": 270,
+        "w": 300,
+        "h": 145
+      },
+      {
+        "id": "l",
+        "text": "loan\nPK id; FK lender_id, borrower_id, initiator_id\nstatus, current_version, completed_on",
+        "x": 540,
+        "y": 270,
+        "w": 370,
+        "h": 145
+      },
+      {
+        "id": "t",
+        "text": "loan_terms\nPK/FK loan_id + PK version\nkind, amount/item, start_date, due_date",
+        "x": 1030,
+        "y": 270,
+        "w": 325,
+        "h": 145
+      },
+      {
+        "id": "c",
+        "text": "loan_confirmation\nPK loan_id + version + user_id\nconfirmed_at",
+        "x": 85,
+        "y": 510,
+        "w": 330,
+        "h": 145
+      },
+      {
+        "id": "a",
+        "text": "loan_activity\nPK id; FK loan_id + version, submitted_by\nactual_date, status, reviewed_by",
+        "x": 540,
+        "y": 510,
+        "w": 370,
+        "h": 145
+      },
+      {
+        "id": "r",
+        "text": "receipt\nPK id; UNIQUE FK activity_id\ncontent_type, content",
+        "x": 1030,
+        "y": 510,
+        "w": 325,
+        "h": 145
+      }
+    ],
+    "edges": [
+      [
+        "u",
+        "l"
+      ],
+      [
+        "l",
+        "t"
+      ],
+      [
+        "t",
+        "a"
+      ],
+      [
+        "t",
+        "c"
+      ],
+      [
+        "a",
+        "r",
+        "1 : 0..1"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "ERD: CIRCLES AND NOTIFICATIONS",
+    "body": [],
+    "note": "Figure 4. Membership is retained after leaving. Existing entries migrate as APPROVED; new member submissions await review.",
+    "nodes": [
+      {
+        "id": "u",
+        "text": "app_user\nPK id",
+        "x": 85,
+        "y": 270,
+        "w": 300,
+        "h": 125
+      },
+      {
+        "id": "c",
+        "text": "savings_circle\nPK id; FK organiser_id\ngoal, contribution, frequency, status",
+        "x": 540,
+        "y": 270,
+        "w": 365,
+        "h": 145
+      },
+      {
+        "id": "m",
+        "text": "circle_member\nPK/FK circle_id + user_id\njoined_on, status, left_at",
+        "x": 1030,
+        "y": 270,
+        "w": 325,
+        "h": 145
+      },
+      {
+        "id": "i",
+        "text": "circle_invitation\nPK id; FK circle_id, invitee_id\nUNIQUE(circle_id, invitee_id), status",
+        "x": 85,
+        "y": 510,
+        "w": 340,
+        "h": 145
+      },
+      {
+        "id": "e",
+        "text": "savings_entry\nPK id; FK circle_id, member_id\nactual_date, status, submitted/reviewed_by",
+        "x": 540,
+        "y": 510,
+        "w": 365,
+        "h": 145
+      },
+      {
+        "id": "n",
+        "text": "notification\nPK id; FK recipient_id\nnullable loan_id, message, dedup_key",
+        "x": 1030,
+        "y": 510,
+        "w": 325,
+        "h": 145
+      }
+    ],
+    "edges": [
+      [
+        "u",
+        "c"
+      ],
+      [
+        "c",
+        "m"
+      ],
+      [
+        "c",
+        "i"
+      ],
+      [
+        "c",
+        "e"
+      ],
+      [
+        "m",
+        "e"
+      ],
+      [
+        "u",
+        "n"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "CLASS DIAGRAM: DESKTOP AND SERVICES",
+    "body": [],
+    "note": "Figure 5. Arrows mean uses. These are concrete classes in the revised Java project.",
+    "nodes": [
+      {
+        "id": "d",
+        "text": "DesktopApplication\nmain() / Spring context\nClock + password encoder",
+        "x": 90,
+        "y": 270,
+        "w": 340,
+        "h": 130
+      },
+      {
+        "id": "w",
+        "text": "DesktopWindow\nAccount tabs / refreshAll()\nOverview + navigation",
+        "x": 550,
+        "y": 270,
+        "w": 340,
+        "h": 130
+      },
+      {
+        "id": "u",
+        "text": "DesktopLoans / DesktopCircles\nSwing forms and tables\nUser actions",
+        "x": 1010,
+        "y": 270,
+        "w": 340,
+        "h": 130
+      },
+      {
+        "id": "a",
+        "text": "AccountService\nregister() / signIn()\nbyEmail() / byId()",
+        "x": 90,
+        "y": 520,
+        "w": 340,
+        "h": 130
+      },
+      {
+        "id": "l",
+        "text": "LoanService\ncreate() / confirm()\nsubmit() / review()",
+        "x": 550,
+        "y": 520,
+        "w": 340,
+        "h": 130
+      },
+      {
+        "id": "c",
+        "text": "CircleService\ncreate() / addMember() [invite]\nrespondInvitation() / reviewEntry()",
+        "x": 1010,
+        "y": 520,
+        "w": 340,
+        "h": 130
+      }
+    ],
+    "edges": [
+      [
+        "d",
+        "w"
+      ],
+      [
+        "w",
+        "u"
+      ],
+      [
+        "w",
+        "a"
+      ],
+      [
+        "u",
+        "l"
+      ],
+      [
+        "u",
+        "c"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "CLASS DIAGRAM: RECORDS AND STORAGE",
+    "body": [],
+    "note": "Figure 6. Models are immutable Java records, not JPA entities. Services use JdbcTemplate and Database.",
+    "nodes": [
+      {
+        "id": "m",
+        "text": "Models (Java records)\nAccount, Loan, Terms, Activity\nCircle, Member, Entry, Invitation",
+        "x": 90,
+        "y": 280,
+        "w": 370,
+        "h": 145
+      },
+      {
+        "id": "s",
+        "text": "Service layer\nAccount / Loan / Circle\nReceipt / Notification",
+        "x": 540,
+        "y": 280,
+        "w": 360,
+        "h": 145
+      },
+      {
+        "id": "r",
+        "text": "Rules\nMoney, dates, email validation\nInvalidInput / NotFound",
+        "x": 1000,
+        "y": 280,
+        "w": 350,
+        "h": 145
+      },
+      {
+        "id": "db",
+        "text": "JdbcTemplate + Database\nSQL queries / transactions\nEmbedded H2 file",
+        "x": 540,
+        "y": 520,
+        "w": 360,
+        "h": 145
+      },
+      {
+        "id": "n",
+        "text": "NotificationService\nScheduled reminders\nUnread state / deduplication",
+        "x": 90,
+        "y": 520,
+        "w": 370,
+        "h": 145
+      },
+      {
+        "id": "ca",
+        "text": "CalendarReminder\nExport .ics due dates\nManual calendar import",
+        "x": 1000,
+        "y": 520,
+        "w": 350,
+        "h": 145
+      }
+    ],
+    "edges": [
+      [
+        "s",
+        "m"
+      ],
+      [
+        "s",
+        "r"
+      ],
+      [
+        "s",
+        "db"
+      ],
+      [
+        "n",
+        "db"
+      ],
+      [
+        "ca",
+        "m"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "USER EXPERIENCE: ACCOUNT TABS",
+    "body": [
+      "Create an account, then sign in through the desktop window.",
+      "New account tab lets another registered user sign in on the same computer.",
+      "Navigation: Overview, Lending ledger, Borrowing, Savings pools, Reminders & trust.",
+      "Saved actions refresh the open account tabs; notices refresh every five seconds."
+    ],
+    "note": "Updated description of the desktop UI; the old browser login mockup no longer represents the implementation.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "USER EXPERIENCE: LENDING",
+    "body": [
+      "Agreement: review parties, terms version, dates and acknowledgements.",
+      "Handover: lender records the exchange; borrower reviews it before activation.",
+      "Repayment / item return: borrower submits; lender confirms or disputes.",
+      "Receipts: attached to loan activities, not automatic payment verification.",
+      "Overview: outstanding balances and loan return reliability."
+    ],
+    "note": "Circle membership and savings do not change the loan return reliability percentage.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "USER EXPERIENCE: SAVINGS POOLS",
+    "body": [
+      "Invitations: accept or decline before becoming a member.",
+      "Members: submit own contribution, date and note; see Pending review in entry history.",
+      "Organiser: select an entry, approve it or reject with a reason.",
+      "Balance and goal progress include approved entries only.",
+      "Leave circle: keeps history read-only; withdraw own pending entries or wait for review before leaving."
+    ],
+    "note": "Organiser records expenses/withdrawals and may close the circle; closing is blocked while reviews remain.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "SEQUENCE: RECORD AND ACTIVATE A LOAN",
+    "body": [],
+    "note": "Figure 7. No external transfer happens in the application.",
+    "nodes": [],
+    "edges": [],
+    "sequence": {
+      "actors": [
+        "Lender / borrower",
+        "DesktopLoans",
+        "LoanService",
+        "H2 database"
+      ],
+      "messages": [
+        [
+          0,
+          1,
+          "Propose terms and acknowledge"
+        ],
+        [
+          1,
+          2,
+          "create(...)"
+        ],
+        [
+          2,
+          3,
+          "Insert loan, terms v1 and initiator confirmation"
+        ],
+        [
+          0,
+          1,
+          "Other party confirms same version"
+        ],
+        [
+          1,
+          2,
+          "confirm(...) -> AWAITING_HANDOVER"
+        ],
+        [
+          0,
+          1,
+          "Lender submits handover; borrower reviews"
+        ],
+        [
+          2,
+          3,
+          "Confirm handover -> ACTIVE"
+        ]
+      ]
+    }
+  },
+  {
+    "title": "SEQUENCE: VIEW REMINDERS",
+    "body": [],
+    "note": "Figure 8. App must be running. Calendar export is manual and does not sync later edits.",
+    "nodes": [],
+    "edges": [],
+    "sequence": {
+      "actors": [
+        "Scheduled job",
+        "NotificationService",
+        "H2 database",
+        "DesktopNotices"
+      ],
+      "messages": [
+        [
+          0,
+          1,
+          "Every minute after 09:00 Manila time"
+        ],
+        [
+          1,
+          2,
+          "Read ACTIVE loans and scheduled circles"
+        ],
+        [
+          1,
+          2,
+          "Insert deduplicated notices"
+        ],
+        [
+          3,
+          1,
+          "Refresh inbox / unread count"
+        ],
+        [
+          1,
+          2,
+          "Read notices for signed-in account"
+        ],
+        [
+          1,
+          3,
+          "Return inbox rows"
+        ],
+        [
+          3,
+          1,
+          "Mark selected notice as read"
+        ]
+      ]
+    }
+  },
+  {
+    "title": "SEQUENCE: CONFIRM RETURN OR REPAYMENT",
+    "body": [],
+    "note": "Figure 9. completed_on uses confirmed actual dates, not the review date.",
+    "nodes": [],
+    "edges": [],
+    "sequence": {
+      "actors": [
+        "Borrower / lender",
+        "DesktopLoans",
+        "LoanService",
+        "H2 database"
+      ],
+      "messages": [
+        [
+          0,
+          1,
+          "Borrower submits repayment / return + actual date"
+        ],
+        [
+          1,
+          2,
+          "submit(...)"
+        ],
+        [
+          2,
+          3,
+          "Insert PENDING_REVIEW activity"
+        ],
+        [
+          0,
+          1,
+          "Lender confirms or disputes"
+        ],
+        [
+          1,
+          2,
+          "review(...) with acknowledgement / reason"
+        ],
+        [
+          2,
+          3,
+          "CONFIRMED updates balance; DISPUTED does not"
+        ],
+        [
+          2,
+          3,
+          "If settled: COMPLETED + completed_on"
+        ]
+      ]
+    }
+  },
+  {
+    "title": "SEQUENCE: CIRCLE CONTRIBUTION REVIEW",
+    "body": [],
+    "note": "Figure 10. Approval retains actual_date and created_at. Rejection retains the record and reason.",
+    "nodes": [],
+    "edges": [],
+    "sequence": {
+      "actors": [
+        "Member / organiser",
+        "DesktopCircles",
+        "CircleService",
+        "H2 database"
+      ],
+      "messages": [
+        [
+          0,
+          1,
+          "Member submits own contribution"
+        ],
+        [
+          1,
+          2,
+          "addEntry(...)"
+        ],
+        [
+          2,
+          3,
+          "Insert PENDING_REVIEW; notify organiser"
+        ],
+        [
+          0,
+          1,
+          "Organiser selects entry and reviews"
+        ],
+        [
+          1,
+          2,
+          "reviewEntry(approve / reject, reason)"
+        ],
+        [
+          2,
+          3,
+          "Update status and reviewer timestamp only"
+        ],
+        [
+          2,
+          3,
+          "Approved sum changes balance; notify member"
+        ]
+      ]
+    }
+  },
+  {
+    "title": "SOFTWARE REQUIREMENTS",
+    "body": [
+      "Platform: Java 21 Swing desktop application; no browser or HTTP server required.",
+      "Application services: Spring Boot with WebApplicationType.NONE.",
+      "Persistence: Spring JDBC / JdbcTemplate and an embedded H2 file database.",
+      "Security: BCrypt password hashing and service-level actor checks.",
+      "Build: Maven; IDE: NetBeans or IntelliJ IDEA. Packaged executable JAR supplied."
+    ],
+    "note": "Replaces the obsolete Spring MVC, Thymeleaf and JPA stack listed in the original proposal.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "HARDWARE AND DEMONSTRATION",
+    "body": [
+      "A desktop or laptop capable of running Java 21 and the Swing interface.",
+      "A writable project folder for data/lendly.mv.db and application files.",
+      "Planning target: 8 GB RAM and 5 GB free storage for development tools.",
+      "Offline classroom demo: one computer, several account tabs, one local database.",
+      "Remote accounts on different computers require a future server/shared-data architecture."
+    ],
+    "note": "Planning targets are not measured minimum requirements. Back up the database with the app closed.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "PROJECT ROLES",
+    "body": [
+      "Project manager: scope, schedule and documentation.",
+      "UI/UX designer: desktop forms, feedback and invitation/review flows.",
+      "Developer: service checks, transactions, schema migration and Swing actions.",
+      "Data administrator: backups, access rules and retained ledger records.",
+      "QA: invitation consent, approval, rejection, leaving and date-preservation tests."
+    ],
+    "note": "",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "NEW FEATURE: INVITATIONS",
+    "body": [],
+    "note": "Figure 11. Membership is created or reactivated only after acceptance.",
+    "nodes": [
+      {
+        "id": "a",
+        "text": "Organiser invites\nRegistered email",
+        "x": 110,
+        "y": 300,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "b",
+        "text": "PENDING invitation\nNo circle access yet",
+        "x": 555,
+        "y": 300,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "c",
+        "text": "Invitee chooses\nAccept / decline",
+        "x": 1000,
+        "y": 300,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "d",
+        "text": "ACCEPTED\nActive membership",
+        "x": 1000,
+        "y": 520,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "e",
+        "text": "DECLINED\nNo membership",
+        "x": 555,
+        "y": 520,
+        "w": 330,
+        "h": 105
+      },
+      {
+        "id": "f",
+        "text": "Circle closes\nPending invites CANCELLED",
+        "x": 110,
+        "y": 520,
+        "w": 330,
+        "h": 105
+      }
+    ],
+    "edges": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "b",
+        "c"
+      ],
+      [
+        "c",
+        "d"
+      ],
+      [
+        "c",
+        "e"
+      ],
+      [
+        "b",
+        "f"
+      ]
+    ],
+    "sequence": null
+  },
+  {
+    "title": "NEW FEATURE: LEAVING A CIRCLE",
+    "body": [
+      "A member explicitly confirms Leave circle.",
+      "Pending contributions must be reviewed or withdrawn by the member before leaving.",
+      "Membership becomes LEFT; member and ledger rows are not deleted.",
+      "The former member keeps a read-only view of shared history and stops receiving contribution reminders.",
+      "The organiser closes the circle instead of leaving; no automatic refund is created."
+    ],
+    "note": "Any settlement or payout occurs outside the app and must be recorded separately by the organiser.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "DATES, APPROVAL AND FAIRNESS",
+    "body": [
+      "Actual date records the reported exchange date; submission time is system-recorded.",
+      "Review time is separate. Approving later does not replace either original date.",
+      "A pending contribution has no effect on the approved balance.",
+      "The existing loan return score is unchanged by circle contributions or approval delay.",
+      "Future circle punctuality: count timely submissions only after approval, and assign a scheduled period explicitly."
+    ],
+    "note": "Example: due Nov 24, submitted Nov 24, approved Nov 27. Submission remains Nov 24; approval delay is not member lateness.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "SUGGESTED NEXT FEATURES",
+    "body": [
+      "Contribution-period selector: assign each approved amount to a specific due date, including partial amounts.",
+      "Review reminders: tell the organiser how many contributions await review and how old they are.",
+      "Corrections: link a replacement submission to the rejected original without deleting the audit history.",
+      "Receipt export: let both parties export a shared circle statement for reconciliation."
+    ],
+    "note": "Suggestions only; these are not claimed as implemented in this revision.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  },
+  {
+    "title": "THANK YOU",
+    "body": [
+      "Lending Ledger and Saving Circle",
+      "Questions and discussion"
+    ],
+    "note": "Tracks records only. No money is held or transferred by the application.",
+    "nodes": [],
+    "edges": [],
+    "sequence": null
+  }
+]
